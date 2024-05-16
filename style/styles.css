@@ -1,0 +1,17 @@
+:root {
+  --sky-top: #171f29;
+  --sky-bottom: #2c3e4d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#canvas {
+  background-image: linear-gradient(var(--sky-top), var(--sky-bottom));
+  position: absolute;
+  top: 0;
+  left: 0;
+}
