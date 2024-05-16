@@ -13,16 +13,12 @@ const mountainColors = ["#374652", "#2a3542", "#202a35"];
 
 // Classes Definitions
 class Ground {
-  constructor(x, y, w, h, color) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
+  constructor(color) {
     this.color = color;
   }
 
   draw() {
-    ctx.fillStyle = groundColor;
+    ctx.fillStyle = this.color;
     ctx.fillRect(0, canvas.height - 100, canvas.width, canvas.height);
   }
 }
@@ -31,7 +27,7 @@ class shootingStar {}
 class star {}
 
 // Classes Objects Declarations
-const ground = new Ground();
+const ground = new Ground(groundColor);
 
 // Function Animate Frames Loop
 function animate() {
