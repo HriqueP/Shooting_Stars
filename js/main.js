@@ -144,6 +144,23 @@ class ShootingStar {
 
     if (this.y + this.radius + this.dy > canvas.height - 100) {
       this.dy = -this.dy * friction;
+      if (this.radius < 2) {
+        shootingStars.shift();
+      } else {
+        this.radius /= 2;
+        for (let i = 0; i < 5; i++) {
+          shootingStars.push(
+            new ShootingStar(
+              this.x,
+              this.y,
+              randomNumber(-5, 5),
+              this.dy + randomNumber(-5, 5),
+              this.radius,
+              this.color
+            )
+          );
+        }
+      }
     } else {
       this.dy += gravity;
     }
@@ -156,11 +173,12 @@ class ShootingStar {
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
+let stars = [];
 let shootingStars = [];
 setInterval(() => {
   let x = Math.random() * canvas.width;
   let dx = Math.random() < 0.5 ? -5 : 5;
-  shootingStars.push(new ShootingStar(x, 0, dx, 10, 4, starColor));
+  shootingStars.push(new ShootingStar(x, 0, dx, 10, 6, starColor));
 }, 1000);
 
 // Function Animate Frames Loop
@@ -184,7 +202,6 @@ window.addEventListener("resize", (event) => {
   init();
 });
 
-let stars = [];
 function init() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -200,3 +217,8 @@ function init() {
   }
 }
 init();
+
+// Function Random Number
+function randomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
