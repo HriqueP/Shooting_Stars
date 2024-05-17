@@ -86,18 +86,40 @@ class Mountain {
     ctx.closePath();
   }
 }
+class Star {
+  constructor(x, y, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.strokeStyle = this.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.closePath();
+  }
+}
 class shootingStar {}
-class star {}
 
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
+const star = new Star(20, 20, 4, starColor);
 
 // Function Animate Frames Loop
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   mountain.draw();
   ground.draw();
+  star.draw();
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
