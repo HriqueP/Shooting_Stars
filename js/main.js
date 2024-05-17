@@ -10,6 +10,8 @@ canvas.height = window.innerHeight;
 const groundColor = "#11171e";
 const starColor = "#f7fcfd";
 const mountainColors = ["#374652", "#2a3542", "#202a35"];
+const gravity = 0.5;
+const friction = 0.54;
 
 // Classes Definitions
 class Ground {
@@ -35,6 +37,7 @@ class Mountain {
     ctx.fillStyle = this.colors[0];
     ctx.fill();
     ctx.closePath();
+
     // Middle
     ctx.beginPath();
     ctx.moveTo(0, canvas.height - 100);
@@ -44,6 +47,7 @@ class Mountain {
     ctx.fillStyle = this.colors[1];
     ctx.fill();
     ctx.closePath();
+
     ctx.beginPath();
     ctx.moveTo(canvas.width / 2, canvas.height - 100);
     ctx.lineTo(canvas.width, canvas.height - 100);
@@ -52,6 +56,7 @@ class Mountain {
     ctx.fillStyle = this.colors[1];
     ctx.fill();
     ctx.closePath();
+
     // Front
     ctx.beginPath();
     ctx.moveTo(0, canvas.height - 100);
@@ -61,6 +66,7 @@ class Mountain {
     ctx.fillStyle = this.colors[2];
     ctx.fill();
     ctx.closePath();
+
     ctx.beginPath();
     ctx.moveTo(canvas.width / 3, canvas.height - 100);
     ctx.lineTo(canvas.width / 3 + canvas.width / 3, canvas.height - 100);
@@ -69,6 +75,7 @@ class Mountain {
     ctx.fillStyle = this.colors[2];
     ctx.fill();
     ctx.closePath();
+
     ctx.beginPath();
     ctx.moveTo(canvas.width / 3 + canvas.width / 3, canvas.height - 100);
     ctx.lineTo(canvas.width, canvas.height - 100);
@@ -86,6 +93,7 @@ class Star {
     this.radius = radius;
     this.color = color;
   }
+
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
@@ -99,12 +107,75 @@ class Star {
     ctx.closePath();
   }
 }
-class shootingStar {}
+class ShootingStar {
+  constructor(x, y, dx, dy, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.strokeStyle = this.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.closePath();
+  }
+
+  update() {
+    this.draw();
+
+    if (
+      this.x + this.radius + this.dx > canvas.width ||
+      this.x - this.radius + this.dx < 0
+    ) {
+      this.dx = -this.dx * friction;
+    }
+
+    if (this.y + this.radius + this.dy > canvas.height - 100) {
+      this.dy = -this.dy * friction;
+      this.radius -= 2;
+    } else {
+      this.dy += gravity;
+    }
+
+    if (Math.round(this.dy) == 0) {
+      this.dy = 0;
+    }
+
+    this.y += this.dy;
+    this.x += this.dx;
+  }
+}
+class Particle {}
 
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
 let stars = [];
+let shootingStars = [];
+setInterval(() => {
+  shootingStars.push(
+    new ShootingStar(
+      Math.random() * canvas.width, // x
+      -10, // y
+      0, // dx
+      randomNumber(10, 15), // dy
+      randomNumber(2, 10), // radius
+      starColor // color
+    )
+  );
+  // console.log(shootingStars.length);
+}, 650);
+let particles = [];
 
 // Function Animate Frames Loop
 function animate() {
@@ -114,6 +185,13 @@ function animate() {
   }
   mountain.draw();
   ground.draw();
+  for (let i = 0; i < shootingStars.length; i++) {
+    shootingStars[i].update();
+
+    if (shootingStars[i].radius <= 0) {
+      shootingStars.splice(i, 1);
+    }
+  }
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
@@ -135,3 +213,8 @@ function init() {
   }
 }
 init();
+
+// Function Random Number
+function randomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
