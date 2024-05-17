@@ -10,8 +10,8 @@ canvas.height = window.innerHeight;
 const groundColor = "#11171e";
 const starColor = "#f7fcfd";
 const mountainColors = ["#374652", "#2a3542", "#202a35"];
-const gravity = 0.2;
-const friction = 0.5;
+const gravity = 0.6;
+const friction = 0.6;
 
 // Classes Definitions
 class Ground {
@@ -135,8 +135,6 @@ class ShootingStar {
   update() {
     this.draw();
 
-    // console.log(shootingStars);
-
     if (
       this.x + this.radius + this.dx > canvas.width ||
       this.x - this.radius + this.dx < 0
@@ -146,19 +144,6 @@ class ShootingStar {
 
     if (this.y + this.radius + this.dy > canvas.height - 100) {
       this.dy = -this.dy * friction;
-      this.radius /= 2;
-      for (let i = 0; i < 5; i++) {
-        shootingStars.push(
-          new ShootingStar(
-            this.x,
-            this.y,
-            randomNumber(-this.dx, this.dx),
-            randomNumber(this.dy - 5, this.dy + 20),
-            this.radius,
-            starColor
-          )
-        );
-      }
     } else {
       this.dy += gravity;
     }
@@ -171,12 +156,11 @@ class ShootingStar {
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
-let stars = [];
 let shootingStars = [];
 setInterval(() => {
   let x = Math.random() * canvas.width;
   let dx = Math.random() < 0.5 ? -5 : 5;
-  shootingStars.push(new ShootingStar(x, 0, dx, 10, 6, starColor));
+  shootingStars.push(new ShootingStar(x, 0, dx, 10, 4, starColor));
 }, 1000);
 
 // Function Animate Frames Loop
@@ -188,12 +172,9 @@ function animate() {
   mountain.draw();
   ground.draw();
   for (let i = 0; i < shootingStars.length; i++) {
-    if (shootingStars[i].radius < 1) {
-      shootingStars.splice(i, 1);
-    } else {
-      shootingStars[i].update();
-    }
+    shootingStars[i].update();
   }
+  // shootingStar.update();
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
@@ -203,6 +184,7 @@ window.addEventListener("resize", (event) => {
   init();
 });
 
+let stars = [];
 function init() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -218,8 +200,3 @@ function init() {
   }
 }
 init();
-
-// Random Number Function
-function randomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
