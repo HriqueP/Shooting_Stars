@@ -112,14 +112,15 @@ class shootingStar {}
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
-const star = new Star(20, 20, 4, starColor);
 
 // Function Animate Frames Loop
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < stars.length; i++) {
+    stars[i].draw();
+  }
   mountain.draw();
   ground.draw();
-  star.draw();
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
@@ -128,8 +129,19 @@ requestAnimationFrame(animate);
 window.addEventListener("resize", (event) => {
   init();
 });
+
+let stars = [];
 function init() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
+  stars = [];
+  for (let i = 0; i < 100; i++) {
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height - 300;
+    let radius = Math.random() * 4 + 1;
+
+    stars.push(new Star(x, y, radius, starColor));
+  }
 }
 init();
