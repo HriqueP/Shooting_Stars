@@ -10,6 +10,8 @@ canvas.height = window.innerHeight;
 const groundColor = "#11171e";
 const starColor = "#f7fcfd";
 const mountainColors = ["#374652", "#2a3542", "#202a35"];
+const gravity = 0.2;
+const friction = 0.5;
 
 // Classes Definitions
 class Ground {
@@ -107,11 +109,75 @@ class Star {
     ctx.closePath();
   }
 }
-class shootingStar {}
+class ShootingStar {
+  constructor(x, y, dx, dy, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.strokeStyle = this.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.closePath();
+  }
+
+  update() {
+    this.draw();
+
+    // console.log(shootingStars);
+
+    if (
+      this.x + this.radius + this.dx > canvas.width ||
+      this.x - this.radius + this.dx < 0
+    ) {
+      this.dx = -this.dx * friction;
+    }
+
+    if (this.y + this.radius + this.dy > canvas.height - 100) {
+      this.dy = -this.dy * friction;
+      this.radius /= 2;
+      for (let i = 0; i < 5; i++) {
+        shootingStars.push(
+          new ShootingStar(
+            this.x,
+            this.y,
+            randomNumber(-this.dx, this.dx),
+            randomNumber(this.dy - 5, this.dy + 20),
+            this.radius,
+            starColor
+          )
+        );
+      }
+    } else {
+      this.dy += gravity;
+    }
+
+    this.y += this.dy;
+    this.x += this.dx;
+  }
+}
 
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
+let stars = [];
+let shootingStars = [];
+setInterval(() => {
+  let x = Math.random() * canvas.width;
+  let dx = Math.random() < 0.5 ? -5 : 5;
+  shootingStars.push(new ShootingStar(x, 0, dx, 10, 6, starColor));
+}, 1000);
 
 // Function Animate Frames Loop
 function animate() {
@@ -121,6 +187,13 @@ function animate() {
   }
   mountain.draw();
   ground.draw();
+  for (let i = 0; i < shootingStars.length; i++) {
+    if (shootingStars[i].radius < 1) {
+      shootingStars.splice(i, 1);
+    } else {
+      shootingStars[i].update();
+    }
+  }
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
@@ -130,13 +203,13 @@ window.addEventListener("resize", (event) => {
   init();
 });
 
-let stars = [];
 function init() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
+  shootingStars = [];
   stars = [];
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 120; i++) {
     let x = Math.random() * canvas.width;
     let y = Math.random() * canvas.height - 300;
     let radius = Math.random() * 4 + 1;
@@ -145,3 +218,8 @@ function init() {
   }
 }
 init();
+
+// Random Number Function
+function randomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
