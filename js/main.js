@@ -10,8 +10,6 @@ canvas.height = window.innerHeight;
 const groundColor = "#11171e";
 const starColor = "#f7fcfd";
 const mountainColors = ["#374652", "#2a3542", "#202a35"];
-const gravity = 0.5;
-const friction = 0.54;
 
 // Classes Definitions
 class Ground {
@@ -115,6 +113,8 @@ class ShootingStar {
     this.dy = dy;
     this.radius = radius;
     this.color = color;
+    this.gravity = 0.5;
+    this.friction = 0.54;
   }
 
   draw() {
@@ -137,44 +137,104 @@ class ShootingStar {
       this.x + this.radius + this.dx > canvas.width ||
       this.x - this.radius + this.dx < 0
     ) {
-      this.dx = -this.dx * friction;
+      this.dx = -this.dx * this.friction;
     }
 
     if (this.y + this.radius + this.dy > canvas.height - 100) {
-      this.dy = -this.dy * friction;
+      this.dy = -this.dy * this.friction;
       this.radius -= 2;
+
+      this.createParticles();
     } else {
-      this.dy += gravity;
+      this.dy += this.gravity;
     }
 
-    if (Math.round(this.dy) == 0) {
-      this.dy = 0;
+    this.y += this.dy;
+    this.x += this.dx;
+  }
+
+  createParticles() {
+    for (let i = 0; i < 5; i++) {
+      particles.push(new Particle(this.x, this.y, this.radius, this.color));
+    }
+  }
+}
+class Particle {
+  constructor(x, y, radius, color) {
+    this.x = x;
+    this.y = y;
+    this.dx = randomNumber(-5, 5);
+    this.dy = randomNumber(-15, 15);
+    this.radius = radius;
+    this.color = color;
+    this.gravity = 0.25;
+    this.friction = 0.54;
+    this.timeOnScreen = 3;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2, false);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = this.color;
+    ctx.strokeStyle = this.color;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.closePath();
+  }
+
+  update() {
+    this.draw();
+
+    if (
+      this.x + this.radius + this.dx > canvas.width ||
+      this.x - this.radius + this.dx < 0
+    ) {
+      this.dx = -this.dx * this.friction;
+    }
+
+    if (this.y + this.radius + this.dy > canvas.height - 100) {
+      this.dy = -this.dy * this.friction;
+      // this.radius -= 2;
+    } else {
+      this.dy += this.gravity;
     }
 
     this.y += this.dy;
     this.x += this.dx;
   }
 }
-class Particle {}
 
 // Classes Objects Declarations
 const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
 let stars = [];
 let shootingStars = [];
-setInterval(() => {
-  shootingStars.push(
-    new ShootingStar(
-      Math.random() * canvas.width, // x
-      -10, // y
-      0, // dx
-      randomNumber(10, 15), // dy
-      randomNumber(2, 10), // radius
-      starColor // color
-    )
-  );
-  // console.log(shootingStars.length);
-}, 650);
+shootingStars.push(
+  new ShootingStar(
+    canvas.width / 2, // x
+    -10, // y
+    0, // dx
+    randomNumber(10, 15), // dy
+    10, // radius
+    starColor // color
+  )
+);
+// setInterval(() => {
+//   shootingStars.push(
+//     new ShootingStar(
+//       Math.random() * canvas.width, // x
+//       -10, // y
+//       0, // dx
+//       randomNumber(10, 15), // dy
+//       randomNumber(2, 10), // radius
+//       starColor // color
+//     )
+//   );
+//   // console.log(shootingStars.length);
+// }, 2000);
 let particles = [];
 
 // Function Animate Frames Loop
@@ -185,13 +245,16 @@ function animate() {
   }
   mountain.draw();
   ground.draw();
-  for (let i = 0; i < shootingStars.length; i++) {
-    shootingStars[i].update();
-
-    if (shootingStars[i].radius <= 0) {
-      shootingStars.splice(i, 1);
+  shootingStars.forEach((value, index) => {
+    shootingStars[index].update();
+    if (shootingStars[index].radius <= 0) {
+      shootingStars.splice(index, 1);
     }
-  }
+  });
+  particles.forEach((value, index) => {
+    particles[index].update();
+  });
+
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
