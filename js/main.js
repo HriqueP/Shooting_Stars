@@ -214,16 +214,6 @@ const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
 let stars = [];
 let shootingStars = [];
-// shootingStars.push(
-//   new ShootingStar(
-//     canvas.width / 2, // x
-//     -10, // y
-//     0, // dx
-//     randomNumber(10, 15), // dy
-//     10, // radius
-//     starColor // color
-//   )
-// );
 setInterval(() => {
   shootingStars.push(
     new ShootingStar(
