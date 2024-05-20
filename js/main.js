@@ -142,7 +142,7 @@ class ShootingStar {
 
     if (this.y + this.radius + this.dy > canvas.height - 100) {
       this.dy = -this.dy * this.friction;
-      this.radius -= 2;
+      this.radius -= 3;
 
       this.createParticles();
     } else {
@@ -155,6 +155,9 @@ class ShootingStar {
 
   createParticles() {
     for (let i = 0; i < 5; i++) {
+      if (this.radius < 0) {
+        this.radius = 0;
+      }
       particles.push(new Particle(this.x, this.y, this.radius, this.color));
     }
   }
@@ -168,8 +171,7 @@ class Particle {
     this.radius = radius;
     this.color = color;
     this.gravity = 0.25;
-    this.friction = 0.54;
-    this.timeOnScreen = 3;
+    this.friction = 0.6;
   }
 
   draw() {
@@ -197,7 +199,7 @@ class Particle {
 
     if (this.y + this.radius + this.dy > canvas.height - 100) {
       this.dy = -this.dy * this.friction;
-      // this.radius -= 2;
+      this.radius -= 1;
     } else {
       this.dy += this.gravity;
     }
@@ -212,29 +214,28 @@ const ground = new Ground(groundColor);
 const mountain = new Mountain(mountainColors);
 let stars = [];
 let shootingStars = [];
-shootingStars.push(
-  new ShootingStar(
-    canvas.width / 2, // x
-    -10, // y
-    0, // dx
-    randomNumber(10, 15), // dy
-    10, // radius
-    starColor // color
-  )
-);
-// setInterval(() => {
-//   shootingStars.push(
-//     new ShootingStar(
-//       Math.random() * canvas.width, // x
-//       -10, // y
-//       0, // dx
-//       randomNumber(10, 15), // dy
-//       randomNumber(2, 10), // radius
-//       starColor // color
-//     )
-//   );
-//   // console.log(shootingStars.length);
-// }, 2000);
+// shootingStars.push(
+//   new ShootingStar(
+//     canvas.width / 2, // x
+//     -10, // y
+//     0, // dx
+//     randomNumber(10, 15), // dy
+//     10, // radius
+//     starColor // color
+//   )
+// );
+setInterval(() => {
+  shootingStars.push(
+    new ShootingStar(
+      Math.random() * canvas.width, // x
+      -10, // y
+      0, // dx
+      randomNumber(10, 15), // dy
+      randomNumber(5, 10), // radius
+      starColor // color
+    )
+  );
+}, 350);
 let particles = [];
 
 // Function Animate Frames Loop
@@ -253,6 +254,9 @@ function animate() {
   });
   particles.forEach((value, index) => {
     particles[index].update();
+    if (particles[index].radius <= 0) {
+      particles.splice(index, 1);
+    }
   });
 
   requestAnimationFrame(animate);
