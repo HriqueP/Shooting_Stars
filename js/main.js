@@ -264,7 +264,7 @@ function init() {
   for (let i = 0; i < 100; i++) {
     let x = Math.random() * canvas.width;
     let y = Math.random() * canvas.height - 300;
-    let radius = Math.random() * 4 + 1;
+    let radius = Math.random() * 2 + 1;
 
     stars.push(new Star(x, y, radius, starColor));
   }
